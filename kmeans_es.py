@@ -1,8 +1,5 @@
 import os
 import numpy as np
-from numpy.core.defchararray import add
-from numpy.matrixlib.defmatrix import matrix
-from sklearn.datasets import load_iris
 import random
 import math
 import pandas as pd
@@ -23,7 +20,6 @@ def load_breast_cancer_dataset():
     data = pd.read_csv("breast-cancer-wisconsin.data", header=None)
     data = np.array(data.iloc[:, 1:10])
     for i in range(len(data)):
-        print(i)
         for j in range(len(data[i])):
             if data[i][j] == '?':
                 data[i][j] = 1
