@@ -25,7 +25,8 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 sudo apt install python3.6
 ```
-
+asd
+ 
 ##Como executar o código deste trabalho
 
 Para execução do código deste trabalho basta executar o programa main.py setando 3 flags cujo nomes são dataset, hybrid e algorithm. A flag dataset aceita 3 valores, digite 0 para executar o código com o conjunto de dados de íris, digite 1 para executar o código com o conjunto de dados de câncer de mama e digite 2 para executar o código com o conjunto de dados de vinho. A flag hybrid aceita 2 valores, digite 0 para executar ES ou DE algoritmos em suas versões normais ou digite 1 para executar ES ou DE algoritmos em suas versões hibridizadas com K-means. A flag algorithm 3 valores, digite 0 para executar o algoritmo ES, digite 1 para executar o algoritmo DE e digite 2 para executar ambos os algoritmos.
