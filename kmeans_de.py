@@ -60,7 +60,7 @@ class cluster:
         return self.list_index_points
             
 
-    def shift_to_new_centroid(self, list_points, index):
+    def SSE_cluster(self, list_points, index):
         shift_aux = 0
         for i in range(len(list_points)):
             for j in range(len(list_points[i])):
@@ -68,7 +68,7 @@ class cluster:
         #shift_aux  = (shift_aux) / len(list_points)
         return shift_aux
 
-    def average_shift_to_new_centroids(self, data):
+    def calculate_SSE_clusters(self, data):
         shift = 0
         #print(len(self.list_index_points))
         for i in range(number_of_centroids):
@@ -83,7 +83,7 @@ class cluster:
                 list_points = []
                 for j in range(len(self.list_index_points[i])):
                     list_points.append(data[self.list_index_points[i][j]])
-                shift_aux = self.shift_to_new_centroid(list_points, i)
+                shift_aux = self.SSE_cluster(list_points, i)
                 shift = shift + shift_aux
         #shift = shift / number_of_centroids
         return shift
@@ -217,15 +217,6 @@ def de_procedure(genomes_to_do_mutatation, old_genome, best_genome):
 
 
 number = 1
-
-def calculate_intra_cluster_distance(best_cluster, data):
-    intra_cluster_dist = 0
-    for i in range(number_of_centroids):
-        for j in range(len(best_cluster.get_list_index_points()[i])):
-            for k in range(len(data[best_cluster.get_list_index_points()[i][j]])):
-                intra_cluster_dist += math.pow((data[best_cluster.get_list_index_points()[i][j]][k]) - best_cluster.get_genome().get_centroids()[i][k],2)
-    intra_cluster_dist = intra_cluster_dist / number_of_centroids
-    return intra_cluster_dist
         
 
 def calculate_inter_cluster_distance(best_cluster):
@@ -241,17 +232,6 @@ def calculate_inter_cluster_distance(best_cluster):
     dist = np.min(dists_list)
     return dist
 
-def calculate_quantization_error(best_cluster, data):
-    quantization_error = 0
-    for i in range(number_of_centroids):
-        aux = 0
-        for j in range(len(best_cluster.get_list_index_points()[i])):
-            for k in range(len(data[best_cluster.get_list_index_points()[i][j]])):
-                aux += math.pow((data[best_cluster.get_list_index_points()[i][j]][k]) - best_cluster.get_genome().get_centroids()[i][k],2)
-        aux = aux / len(best_cluster.get_list_index_points()[i])
-        quantization_error += aux
-    quantization_error = quantization_error / number_of_centroids
-    return quantization_error
 
 def print_best_genome(clusters_to_each_genome):
     global number
@@ -298,7 +278,7 @@ def execute_de_algorithm(number_of_dataset, kmeans_flag):
         for i in range(len(clusters_to_each_genome)):
             clusters_to_each_genome[i] = kmeans(x ,clusters_to_each_genome[i])
 
-    best_avarage_shift_to_new_centroids = 100000
+    best_avarage_SSE_clusters = 100000
     best_antes = 0
     repeted = 0
     for _ in range(number_of_epochs):
@@ -320,9 +300,9 @@ def execute_de_algorithm(number_of_dataset, kmeans_flag):
             #clusters_to_each_genome.append(clusters_aux)
             index_set.clear()
             index_list.clear()
-            clusters_aux.average_shift = clusters_aux.average_shift_to_new_centroids(x)
+            clusters_aux.average_shift = clusters_aux.calculate_SSE_clusters(x)
 
-            clusters_to_each_genome[i].average_shift = clusters_to_each_genome[i].average_shift_to_new_centroids(x)
+            clusters_to_each_genome[i].average_shift = clusters_to_each_genome[i].calculate_SSE_clusters(x)
             #if i < 15:
             #    print(clusters_to_each_genome[i].average_shift)
             if clusters_to_each_genome[i].average_shift > clusters_aux.average_shift:
@@ -331,17 +311,15 @@ def execute_de_algorithm(number_of_dataset, kmeans_flag):
         clusters_to_each_genome = sorted(clusters_to_each_genome, key=lambda x: x.average_shift, reverse= False)
 
         print_best_genome(clusters_to_each_genome)
-        best_avarage_shift_to_new_centroids = clusters_to_each_genome[0].average_shift
-        if(best_antes == best_avarage_shift_to_new_centroids):
+        best_avarage_SSE_clusters = clusters_to_each_genome[0].average_shift
+        if(best_antes == best_avarage_SSE_clusters):
             repeted += 1
             if repeted == 40:
                 break
         else:
             repeted = 0
-        best_antes = best_avarage_shift_to_new_centroids
+        best_antes = best_avarage_SSE_clusters
     with open("results.txt", "a") as writer:
-        writer.write("intra = " + str(best_avarage_shift_to_new_centroids/ number_of_centroids) + "\n")
         writer.write("inter = " + str(calculate_inter_cluster_distance(clusters_to_each_genome[0])) + "\n")
-        writer.write("qe = " + str(calculate_quantization_error(clusters_to_each_genome[0], x)) + "\n" )
-        writer.write("sse = " + str(best_avarage_shift_to_new_centroids) + "\n")
+        writer.write("sse = " + str(best_avarage_SSE_clusters) + "\n")
         writer.write("\n")
